@@ -116,13 +116,9 @@ func readCSV() []string {
 	}
 
 	urls := make([]string, NB_REQUEST)
-	for i, r := range records {
-		if i >= NB_REQUEST {
-			break
-		}
-		urls[i] = r[0] + "://" + ReverseHostname(r[1]) + r[2]
+	for i := 1; i < NB_REQUEST; i++ {
+		urls[i] = records[i][0] + "://" + ReverseHostname(records[i][1]) + records[i][2]
 	}
-
 	return urls
 }
 
