@@ -14,7 +14,7 @@ import (
 	"time"
 )
 
-var NB_REQUEST = 10_000
+var NB_REQUEST = 2_000
 var resultChan = make(chan error)
 
 var crawlers = map[string]func(ctx context.Context, urls []string) Crawler{
@@ -90,6 +90,7 @@ OuterLoop:
 		}
 	}
 	duration := time.Since(start)
+	errOthers := err - errTimeouts - errNoSuchHost - errCertificate - errNetworkUnreachable
 
 	// Report
 	fmt.Printf("%s results:\n", os.Args[1])
@@ -100,6 +101,7 @@ OuterLoop:
 	fmt.Printf("   ├── %d no such host (%.3f%%)\n", errNoSuchHost, percent(errNoSuchHost, err))
 	fmt.Printf("   ├── %d bad certificate (%.3f%%)\n", errCertificate, percent(errCertificate, err))
 	fmt.Printf("   ├── %d network is unreachable (%.3f%%)\n", errNetworkUnreachable, percent(errNetworkUnreachable, err))
+	fmt.Printf("   └── %d others (%.3f%%)\n", errOthers, percent(errOthers, err))
 }
 
 func readCSV() []string {
