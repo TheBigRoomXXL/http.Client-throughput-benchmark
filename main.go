@@ -15,7 +15,7 @@ import (
 )
 
 const NB_REQUEST = 50_000
-const SEMAPHORE_SIZE = 800
+const SEMAPHORE_SIZE = 600
 
 var resultChan = make(chan error)
 
