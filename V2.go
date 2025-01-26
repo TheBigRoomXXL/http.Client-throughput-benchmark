@@ -21,7 +21,7 @@ func NewCrawlerV2(ctx context.Context, urls []string) Crawler {
 
 func (c *CrawlerV2) Run() {
 	client := http.DefaultClient
-	sem := make(chan struct{}, 400)
+	sem := make(chan struct{}, SEMAPHORE_SIZE)
 	wg := &sync.WaitGroup{}
 	wg.Add(len(c.urls))
 	for _, url := range c.urls {

@@ -31,7 +31,7 @@ func (c *CrawlerV3A) Run() {
 	}).DialContext
 
 	client := http.Client{Transport: transport}
-	sem := make(chan struct{}, 400)
+	sem := make(chan struct{}, SEMAPHORE_SIZE)
 	wg := &sync.WaitGroup{}
 	wg.Add(len(c.urls))
 	for _, url := range c.urls {

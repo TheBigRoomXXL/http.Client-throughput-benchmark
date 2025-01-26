@@ -14,7 +14,9 @@ import (
 	"time"
 )
 
-var NB_REQUEST = 2_000
+const NB_REQUEST = 50_000
+const SEMAPHORE_SIZE = 800
+
 var resultChan = make(chan error)
 
 var crawlers = map[string]func(ctx context.Context, urls []string) Crawler{
