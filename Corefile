@@ -1,5 +1,11 @@
 . {
-    forward . 1.1.1.1 
-    cache
+    log
+    forward . 1.1.1.1 8.8.8.8 9.9.9.9 {
+        force_tcp
+    }
+    cache 3600 {
+        success 19968
+        prefetch 1 10m 80%
+    }
     errors
 }
