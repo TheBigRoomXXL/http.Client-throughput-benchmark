@@ -20,11 +20,11 @@ const SEMAPHORE_SIZE = 800
 var resultChan = make(chan error)
 
 var crawlers = map[string]func(ctx context.Context, urls []string) Crawler{
-	"v1":  NewCrawlerV1,
-	"v2":  NewCrawlerV2,
-	"v3a": NewCrawlerV3A,
-	"v3b": NewCrawlerV3B,
-	"v3c": NewCrawlerV3C,
+	"V1":  NewCrawlerV1,
+	"V2":  NewCrawlerV2,
+	"V3A": NewCrawlerV3A,
+	"V3B": NewCrawlerV3B,
+	"V3C": NewCrawlerV3C,
 }
 
 type Crawler interface {
@@ -32,23 +32,33 @@ type Crawler interface {
 }
 
 func main() {
-	// Init
 	urls := readCSV()
+	if len(os.Args) > 2 {
+		log.Fatal("expect the crawler version as argument")
+	}
+	v := strings.ToUpper(os.Args[1])
+	newCrawler, ok := crawlers[v]
+	if !ok {
+		log.Fatal("invalid crawler version")
+	}
+
 	// Concelation context
 	ctx, stop := context.WithCancel(context.Background())
-
-	// Stop after 30s
-	time.AfterFunc(30*time.Second, stop)
-
-	// Stop on interupt
-	signalChan := make(chan os.Signal, 1)
+	time.AfterFunc(30*time.Second, stop)  // stop after 30s
+	signalChan := make(chan os.Signal, 1) // Stop on interupt
 	signal.Notify(signalChan, syscall.SIGINT, syscall.SIGTERM)
 	go func() {
 		<-signalChan
 		stop()
 	}()
-	crawler := crawlers[os.Args[1]](ctx, urls)
 
+	fmt.Printf("NB_REQUEST = %d\n", NB_REQUEST)
+	fmt.Printf("SEMAPHORE_SIZE = %d\n", SEMAPHORE_SIZE)
+	benchmark(ctx, v, newCrawler(ctx, urls))
+
+}
+
+func benchmark(ctx context.Context, label string, crawler Crawler) {
 	err := 0
 	errTimeouts := 0
 	errTimeoutsLookup := 0
@@ -95,7 +105,7 @@ OuterLoop:
 	errOthers := err - errTimeouts - errNoSuchHost - errCertificate - errNetworkUnreachable
 
 	// Report
-	fmt.Printf("%s results:\n", os.Args[1])
+	fmt.Printf("%s results:\n", label)
 	fmt.Printf("%d requests done in %.2fs - %.2freq/s\n", total, duration.Seconds(), float64(total)/duration.Seconds())
 	fmt.Printf("%d errs (%.3f%%)\n", err, percent(err, total))
 	fmt.Printf(" └─┬─┬ %d timeouts (%.3f%%)\n", errTimeouts, percent(errTimeouts, err))
