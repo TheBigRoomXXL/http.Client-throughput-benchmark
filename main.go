@@ -15,7 +15,7 @@ import (
 )
 
 const NB_REQUEST = 50_000
-const SEMAPHORE_SIZE = 1000
+const SEMAPHORE_SIZE = 4000
 
 var resultChan = make(chan error)
 
@@ -26,6 +26,7 @@ var crawlers = map[string]func(ctx context.Context, urls []string) Crawler{
 	"V3B": NewCrawlerV3B,
 	"V3C": NewCrawlerV3C,
 	"V3D": NewCrawlerV3D,
+	"V3E": NewCrawlerV3E,
 	"V4":  NewCrawlerV4,
 	"V5":  NewCrawlerV5,
 }
