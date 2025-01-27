@@ -32,6 +32,7 @@ func (c *CrawlerV5) Run() {
 		Dial: func(addr string) (net.Conn, error) {
 			return fasthttp.DialTimeout(addr, 10*time.Second)
 		},
+		MaxConnsPerHost: 2000,
 	}
 
 	for _, url := range c.urls {
